@@ -2,7 +2,7 @@ University: [ITMO University](https://itmo.ru/ru/)<br />
 Faculty: [FICT](https://fict.itmo.ru)<br />
 Course: [Network programming](https://github.com/itmo-ict-faculty/network-programming)<br /> 
 Year: 2025/2026<br />
-Group: K3323<br />
+Group: K3320<br />
 Author: Zyuzin Vladislav Alexandrovich<br />
 Lab: Lab1<br />
 Date of create: 20.03.2026<br />
