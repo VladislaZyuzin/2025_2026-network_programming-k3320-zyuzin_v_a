@@ -119,12 +119,12 @@ sudo systemctl start wg-quick@wg0
 
 Пропишем туда данные (вводите это лучше через гуи, так как замучаетесь вводить публичный ключь wireguard-а с VPS):
 
-```
+```rsc
 /interface wireguard peers
 add allowed-address=10.10.0.1/24 interface=wireguard0 endpoint-address=IP_VPS endpoint-port=51820 public-key="ПУБЛИЧНЫЙ_КЛЮЧ_VPS"
 ```
 Не звбываем добавить маршрут и настроить фаервол
-```
+```rsc
 /ip route
 add dst-address=10.10.0.0/24 gateway=wireguard0
 
