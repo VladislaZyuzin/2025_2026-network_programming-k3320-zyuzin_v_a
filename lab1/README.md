@@ -75,9 +75,14 @@ sudo mkdir /etc/wireguard/keys
 wg genkey | sudo tee /etc/wireguard/keys/server_private.key | wg pubkey | sudo tee /etc/wireguard/keys/server_public.key
 ```
 
+Создаём переменную с сохранением приватного ключа: 
+```bash
+SERVER_PRIVATE_KEY=$(sudo cat /etc/wireguard/keys/server_private.key)
+```
+Если вам всё рано на безопасность - то просто вводите её в конфиг ниже
+
 Далее - я записал конфиг для работы VPN-соединения `/etc/wireguard/wg0.conf`:
 ```
-SERVER_PRIVATE_KEY=$(sudo cat /etc/wireguard/keys/server_private.key)
 [Interface]
 Address = 10.10.0.1/24
 ListenPort = 51820
