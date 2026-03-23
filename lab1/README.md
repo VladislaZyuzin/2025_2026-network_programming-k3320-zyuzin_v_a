@@ -104,7 +104,7 @@ sudo ufw allow 51820/udp
 ```rsc
 /interface wireguard
 add listen-port=51820 name=wireguard0
-/interface wireguard print (нам понадобится публичный ключь)
+/interface wireguard print  # (нам понадобится публичный ключь)
 /ip address
 add address=10.10.0.2/32 interface=wireguard0
 ```
