@@ -124,7 +124,9 @@ ansible_password=123
         - { content: "NEIGHBORS:\n{{ chr_output.stdout[1] }}", suffix: "ospf.txt" }
 ```
 
+Запускаем плейбук и видим следующее:
 
+<img width="933" height="806" alt="image" src="https://github.com/user-attachments/assets/cf5e40a8-fe28-453d-a88a-b54b10b6acc9" />
 
 Корректеая работа
 
