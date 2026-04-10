@@ -124,13 +124,19 @@ ansible_password=123
         - { content: "NEIGHBORS:\n{{ chr_output.stdout[1] }}", suffix: "ospf.txt" }
 ```
 
+
+
 Корректеая работа
-
-
-
 
 <img width="992" height="651" alt="image" src="https://github.com/user-attachments/assets/9ef9f74b-6f05-40b2-a192-e85b74c356c9" />
 
 <img width="856" height="480" alt="image" src="https://github.com/user-attachments/assets/dd95b09b-f754-4af9-a607-fc4f4dcaacf6" />
 
+Так же - проверим ntp: 
+
+<img width="514" height="439" alt="image" src="https://github.com/user-attachments/assets/e2acd68f-35a0-41c2-9898-611b7d24f1af" />
+
+И юзера (я делал несколько версий плейбука, так что пользователь может отличаться): 
+
+<img width="544" height="150" alt="image" src="https://github.com/user-attachments/assets/d54a17a4-5712-497c-b425-4c7f88bb6bb5" />
 
