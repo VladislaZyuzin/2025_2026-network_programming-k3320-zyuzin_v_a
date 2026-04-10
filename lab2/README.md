@@ -71,83 +71,57 @@ ansible_password=123
 После чего - пропишем плейбук:
 
 ```yaml
-- name: Configure and Collect Data from MikroTik
+- name: Lab2 Setup
   hosts: routers
   gather_facts: no
 
   tasks:
-    # 1. Подготовка локальной среды
-    - name: Ensure configs directory exists on host
+    - name: Prepare local directory
       delegate_to: localhost
       file:
         path: "./configs"
         state: directory
 
-    # 2. Настройка пользователя (Требование ТЗ: логин/пароль)
-    - name: Create admin user
+    - name: Connectivity and Firewall fixes
       community.routeros.command:
         commands:
-          - /user add name=admin_vlad password=SuperSecretPassword123 group=full
+          - /ip firewall filter add chain=input protocol=ospf action=accept place-before=0 comment="Allow OSPF"
+          - /interface wireguard set [find] mtu=1300
       ignore_errors: yes
 
-    # 3. Системные настройки
-    - name: Set identity
+    - name: User setup
       community.routeros.command:
         commands:
+          - /user add name=vlad_admin password=SafePassword2026! group=full
           - /system identity set name={{ inventory_hostname }}
-
-    - name: Configure NTP Client
-      community.routeros.command:
-        commands:
-          - /system ntp client set enabled=yes
-          - /system ntp client servers add address=pool.ntp.org
+          - /system ntp client set enabled=yes servers=pool.ntp.org
       ignore_errors: yes
 
-    # 4. Настройка OSPF (Синтаксис v7)
-    - name: Create OSPF Instance
+    - name: OSPF v7 Setup
       community.routeros.command:
         commands:
-          - /routing ospf instance add name=default-v2 router-id={{ ansible_host }} disabled=no
+          - /routing ospf instance add name=inst router-id={{ ansible_host }} disabled=no
+          - /routing ospf area add name=backbonev2 instance=inst area-id=0.0.0.0
+          - /routing ospf interface-template add area=backbonev2 networks=10.100.0.0/24 type=ptp
+          # Прописываем соседа: для chr1 это .3, для chr2 это .2
+          - "/routing ospf static-neighbor add address={{ '10.100.0.3' if inventory_hostname == 'chr1' else '10.100.0.2' }} instance=inst"
       ignore_errors: yes
 
-    - name: Create OSPF Area
+    - name: Collect evidence
       community.routeros.command:
         commands:
-          - /routing ospf area add name=backbone-v2 instance=default-v2 area-id=0.0.0.0 disabled=no
-      ignore_errors: yes
-
-    - name: Create OSPF Interface Template
-      community.routeros.command:
-        commands:
-          - /routing ospf interface-template add networks=10.100.0.0/24 area=backbone-v2 type=ptp
-      ignore_errors: yes
-
-    # 5. Сбор фактов и выполнение команд для отчета
-    - name: Gather facts
-      community.routeros.facts:
-        gather_subset:
-          - default
-      register: device_facts
-
-    - name: Collect OSPF state and Full Config
-      community.routeros.command:
-        commands:
-          - /routing ospf neighbor print
           - /export compact
-      register: show_commands
+          - /routing ospf neighbor print detail
+      register: chr_output
 
-    # 6. Сохранение результатов в файлы
-    - name: Save configuration to local file
+    - name: Save result files
       delegate_to: localhost
       copy:
-        content: "{{ show_commands.stdout[1] }}"
-        dest: "./configs/{{ inventory_hostname }}_config.txt"
-
-    - name: Save OSPF neighbors to local file
-      delegate_to: localhost
-      copy:
-        content: "{{ show_commands.stdout[0] }}"
-        dest: "./configs/{{ inventory_hostname }}_ospf.txt"
+        content: "{{ item.content }}"
+        dest: "./configs/{{ inventory_hostname }}_{{ item.suffix }}"
+      loop:
+        - { content: "{{ chr_output.stdout[0] }}", suffix: "export.txt" }
+        - { content: "NEIGHBORS:\n{{ chr_output.stdout[1] }}", suffix: "ospf.txt" }
 ```
 
 Корректеая работа
