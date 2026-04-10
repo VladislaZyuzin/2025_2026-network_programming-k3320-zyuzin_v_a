@@ -44,8 +44,114 @@ Date of finished: ---<br />
 <img width="534" height="328" alt="image" src="https://github.com/user-attachments/assets/9a2bf7ee-5956-4773-9c3f-dd3e83c2c7e5" />
 
 После того, как мы проверили, что можем на них зайти с vps по ssh, то можно приступать к настройке ансамбля. Качнём нужные коллекции:
+
+```bash
+ansible-galaxy collection install community.routeros
+ansible-galaxy collection install ansible.netcommon
+```
+
+После чего прописываем инвентори:
+
+```yaml
+[routers]
+chr1 ansible_host=10.100.0.2
+chr2 ansible_host=10.100.0.3
+
+[routers:vars]
+ansible_connection=network_cli
+ansible_network_os=community.routeros.routeros
+ansible_user=ansible
+ansible_password=123
+```
+
+Для проверки выполним: 
+
+<img width="1255" height="514" alt="image" src="https://github.com/user-attachments/assets/c3dc8c3f-2893-4199-b5fe-1120e1a81daa" />
+
+После чего - пропишем плейбук:
+
+```yaml
+- name: Configure and Collect Data from MikroTik
+  hosts: routers
+  gather_facts: no
+
+  tasks:
+    # 1. Подготовка локальной среды
+    - name: Ensure configs directory exists on host
+      delegate_to: localhost
+      file:
+        path: "./configs"
+        state: directory
+
+    # 2. Настройка пользователя (Требование ТЗ: логин/пароль)
+    - name: Create admin user
+      community.routeros.command:
+        commands:
+          - /user add name=admin_vlad password=SuperSecretPassword123 group=full
+      ignore_errors: yes
+
+    # 3. Системные настройки
+    - name: Set identity
+      community.routeros.command:
+        commands:
+          - /system identity set name={{ inventory_hostname }}
+
+    - name: Configure NTP Client
+      community.routeros.command:
+        commands:
+          - /system ntp client set enabled=yes
+          - /system ntp client servers add address=pool.ntp.org
+      ignore_errors: yes
+
+    # 4. Настройка OSPF (Синтаксис v7)
+    - name: Create OSPF Instance
+      community.routeros.command:
+        commands:
+          - /routing ospf instance add name=default-v2 router-id={{ ansible_host }} disabled=no
+      ignore_errors: yes
+
+    - name: Create OSPF Area
+      community.routeros.command:
+        commands:
+          - /routing ospf area add name=backbone-v2 instance=default-v2 area-id=0.0.0.0 disabled=no
+      ignore_errors: yes
+
+    - name: Create OSPF Interface Template
+      community.routeros.command:
+        commands:
+          - /routing ospf interface-template add networks=10.100.0.0/24 area=backbone-v2 type=ptp
+      ignore_errors: yes
+
+    # 5. Сбор фактов и выполнение команд для отчета
+    - name: Gather facts
+      community.routeros.facts:
+        gather_subset:
+          - default
+      register: device_facts
+
+    - name: Collect OSPF state and Full Config
+      community.routeros.command:
+        commands:
+          - /routing ospf neighbor print
+          - /export compact
+      register: show_commands
+
+    # 6. Сохранение результатов в файлы
+    - name: Save configuration to local file
+      delegate_to: localhost
+      copy:
+        content: "{{ show_commands.stdout[1] }}"
+        dest: "./configs/{{ inventory_hostname }}_config.txt"
+
+    - name: Save OSPF neighbors to local file
+      delegate_to: localhost
+      copy:
+        content: "{{ show_commands.stdout[0] }}"
+        dest: "./configs/{{ inventory_hostname }}_ospf.txt"
+```
+
 Корректеая работа
-<img width="1262" height="1032" alt="image" src="https://github.com/user-attachments/assets/9037b5c7-87da-4dc1-824b-eaec63c50ac5" />
+
 
 
 
