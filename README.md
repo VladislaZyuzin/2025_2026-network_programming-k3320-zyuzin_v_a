@@ -8,7 +8,7 @@ Group: K3320<br />
 Author: Zyuzin Vladislav Alexandrovich<br />
 
 Лабораторные работы:
-1. [Установка CHR и Ansible, настройка VPN]
-2. [Развертывание дополнительного CHR, первый сценарий Ansible]
+1. [Установка CHR и Ansible, настройка VPN](https://github.com/VladislaZyuzin/2025_2026-network_programming-k3320-zyuzin_v_a/tree/main/lab1)
+2. [Развертывание дополнительного CHR, первый сценарий Ansible](https://github.com/VladislaZyuzin/2025_2026-network_programming-k3320-zyuzin_v_a/tree/main/lab2)
 3. Развертывание Netbox, сеть связи как источник правды в системе технического учета Netbox
 4. Базовая 'коммутация' и туннелирование используя язык программирования P4
