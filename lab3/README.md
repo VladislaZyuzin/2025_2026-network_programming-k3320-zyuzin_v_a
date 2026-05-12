@@ -262,7 +262,7 @@ lab_configure.yml:
 
 и наконец netbox_inventory.yml:
 
-```
+```yaml
 [routers]
 chr1 ansible_host=10.100.0.2
 chr2 ansible_host=10.100.0.3
@@ -291,7 +291,7 @@ compose:
 
 На выходе должно появиться netbox_data.json:
 
-```yaml
+```json
 {
     "device_roles": [
         {
