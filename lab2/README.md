@@ -6,7 +6,7 @@ Group: K3320<br />
 Author: Zyuzin Vladislav Alexandrowich<br />
 Lab: Lab2<br />
 Date of create: 10.04.2026<br />
-Date of finished: ---<br />
+Date of finished: 10.04.2026
 
 # Задание
 
